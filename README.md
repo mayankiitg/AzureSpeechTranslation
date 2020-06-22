@@ -1,4 +1,4 @@
-# English to Hindi AUdio to Audio Conversion.
+# English to Hindi Audio to Audio Conversion.
 
 ## Project contains resources to translate English audio to Hindi by following the following pipeline.
 1. English speech to text first.
