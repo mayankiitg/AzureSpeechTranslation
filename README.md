@@ -6,3 +6,8 @@
 3. planning to have Speech synthesis API to generate Audio.
 
 Currently we are trying Azure Cognitive serives, speech service.
+
+
+
+## References:
+1. https://docs.microsoft.com/bs-latn-ba/azure///cognitive-services/speech-service/quickstarts/text-to-speech-audio-file?tabs=ubuntu%2Cwindowsinstall&pivots=programming-language-python
