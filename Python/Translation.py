@@ -2,7 +2,9 @@ import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech.audio import AudioConfig
 import time
 
-speech_key, service_region = "", "eastus"
+with open('/Users/mayankgupta/Projects/TTB/AzureCognitiveServices/key.txt', 'r') as f:
+    speech_key = f.readline().rstrip()
+service_region = "eastus"
 
 # Creates an instance of a speech translation config with specified subscription key and service region.
 # Replace with your own subscription key and region identifier from here: https://aka.ms/speech/sdkregion
@@ -15,14 +17,16 @@ translation_config.speech_recognition_language = fromLanguage
 translation_config.add_target_language('hi')
 
 folderPath = '/Users/mayankgupta/Projects/TTB/AzureCognitiveServices/Results/'
-fileName = '3blue1brown-channel-trailer'
+fileName = 'speed_khan_academy' #'KhanAcademyLinearAlgebra' #'3blue1brown-channel-trailer'
 fileExt = '.wav'
 audio_config: AudioConfig = AudioConfig(filename=folderPath+fileName+fileExt)
+
 
 def WriteToFile(results, fileName):
     with open(fileName, "wb") as f:
         for s in results:
-            f.write(s.encode("UTF-8") + "\n")
+            s += "\n"
+            f.write(s.encode("UTF-8"))
             
 
 def translate_microphone():
@@ -79,11 +83,11 @@ def translate_continuous():
 
     speech_recognizer.recognized.connect(handle_final_result)
     # Connect callbacks to the events fired by the speech recognizer
-    speech_recognizer.recognizing.connect(lambda evt: print('RECOGNIZING: {}'.format(evt)))
-    speech_recognizer.recognized.connect(lambda evt: print('RECOGNIZED: {}'.format(evt)))
-    speech_recognizer.session_started.connect(lambda evt: print('SESSION STARTED: {}'.format(evt)))
-    speech_recognizer.session_stopped.connect(lambda evt: print('SESSION STOPPED {}'.format(evt)))
-    speech_recognizer.canceled.connect(lambda evt: print('CANCELED {}'.format(evt)))
+    # speech_recognizer.recognizing.connect(lambda evt: print('RECOGNIZING: {}'.format(evt)))
+    # speech_recognizer.recognized.connect(lambda evt: print('RECOGNIZED: {}'.format(evt)))
+    # speech_recognizer.session_started.connect(lambda evt: print('SESSION STARTED: {}'.format(evt)))
+    # speech_recognizer.session_stopped.connect(lambda evt: print('SESSION STOPPED {}'.format(evt)))
+    # speech_recognizer.canceled.connect(lambda evt: print('CANCELED {}'.format(evt)))
     # stop continuous recognition on either session stopped or canceled events
     speech_recognizer.session_stopped.connect(stop_cb)
     speech_recognizer.canceled.connect(stop_cb)
@@ -96,8 +100,8 @@ def translate_continuous():
     print("Printing all results:")
     print(all_results)
     print(all_hindi_results)
-    WriteToFile(all_results, f"{fileName}transcribe_eng.txt")
-    WriteToFile(all_hindi_results, f"{fileName}translate_hindi.txt")
+    WriteToFile(all_results, f"Results/{fileName}_transcribe_eng.txt")
+    WriteToFile(all_hindi_results, f"Results/{fileName}_translate_hindi.txt")
 
 #translate_microphone()
 translate_continuous()
