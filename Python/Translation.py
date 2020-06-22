@@ -28,10 +28,10 @@ def WriteToFile(results, fileName):
             s += "\n"
             f.write(s.encode("UTF-8"))
             
+# WriteToFile(['a','b'], f"Results/{fileName}_transcribe_eng.txt")
 
 def translate_microphone():
 
-    # Creates a translation recognizer using and audio file as input.
     # By default it will use microphone.
     recognizer = speechsdk.translation.TranslationRecognizer(translation_config=translation_config)
 
