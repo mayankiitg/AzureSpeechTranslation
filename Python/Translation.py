@@ -14,7 +14,7 @@ translation_config = speechsdk.translation.SpeechTranslationConfig(subscription=
 # Replace with the languages of your choice, from list found here: https://aka.ms/speech/sttt-languages
 fromLanguage = 'en-US'
 translation_config.speech_recognition_language = fromLanguage
-translation_config.add_target_language('hi')
+translation_config.add_target_language('hi-IN')
 
 folderPath = '/Users/mayankgupta/Projects/TTB/AzureCognitiveServices/Results/'
 fileName = 'speed_khan_academy' #'KhanAcademyLinearAlgebra' #'3blue1brown-channel-trailer'
