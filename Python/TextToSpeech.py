@@ -4,15 +4,15 @@ import time
 
 ########### CONFIGURTATION #####
 STORE_TO_FILE = 1
-folderPath = '/Users/mayankgupta/Projects/TTB/AzureCognitiveServices/Results/'
-fileName = 'KhanAcademyLinearAlgebratranslate_hindi.txt' #'KhanAcademyLinearAlgebra' #'3blue1brown-channel-trailer'
+folderPath = '../Results/'
+fileName = 'speed_khan_academy_translate_hindi.txt' #'KhanAcademyLinearAlgebra' #'3blue1brown-channel-trailer'
 #########
 
 
 
 # Creates an instance of a speech config with specified subscription key and service region.
 # Replace with your own subscription key and service region (e.g., "westus").
-with open('/Users/mayankgupta/Projects/TTB/AzureCognitiveServices/key.txt', 'r') as f:
+with open('./key.txt', 'r') as f:
     speech_key = f.readline().rstrip()
 service_region = "eastus"
 
@@ -22,7 +22,7 @@ speech_config.speech_recognition_language = 'hi-IN'
 
 # Creates an audio configuration that points to an audio file.
 # Replace with your own audio filename.
-audio_filename = "Results/sample_audio.wav"
+audio_filename = "../Results/sample_audio.wav"
 audio_output = speechsdk.audio.AudioOutputConfig(filename=audio_filename)
 
 if STORE_TO_FILE:
@@ -32,10 +32,7 @@ else:
     # Creates a speech synthesizer using the default speaker as audio output.
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
 
-# Receives a text from console input.
-print("Type some text that you want to speak...")
-
-with open(folderPath+fileName, "r") as f:
+with open(folderPath+fileName, "r", encoding='utf8') as f:
     text = f.read()
 
 print(text)
