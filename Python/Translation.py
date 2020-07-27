@@ -1,7 +1,8 @@
-import azure.cognitiveservices.speech as speechsdk
-from azure.cognitiveservices.speech.audio import AudioConfig
 import time
 import json
+import azure.cognitiveservices.speech as speechsdk
+from typing import List
+from azure.cognitiveservices.speech.audio import AudioConfig
 from Utterance import Utterance, WordWithDuration
 from Utils import WriteToFile, readSpeechKey, getServiceRegion
 
@@ -33,7 +34,20 @@ def create_audio_config():
     audio_config: AudioConfig = AudioConfig(filename=folderPath+fileName+fileExt)
     return audio_config
 
-def translate_continuous():
+def getUtteranceFromEvent(evt):
+    # englishSentences = evt.result.text.split('.')
+    # translatedText = evt.result.translations['hi'].split(u'।')
+    parsedWords = json.loads(evt.result.json)['Words']
+    english = evt.result.text
+    hindi = evt.result.translations['hi']
+    words = []
+    for word in parsedWords:
+        words.append(WordWithDuration(word['Duration'], word['Offset'], word['Word']))
+    utteranceDuration = words[-1].offset+ words[-1].duration - words[0].offset
+    print(f'Got utterence with {len(words)} words and {utteranceDuration} duration')
+    return Utterance(english, hindi, words, utteranceDuration)
+
+def speech_to_hindi_text() -> List[Utterance]:
     translation_config = create_translation_config()
     audio_config = create_audio_config()
      # Creates a translation recognizer using and audio file as input.
@@ -52,26 +66,18 @@ def translate_continuous():
     json_results = []
     utterances = []
     def handle_final_result(evt):
-        print('evt: {}'.format(evt.result.translations))
+        print(f'Completed translation for text: {evt.result.text}')
+        # print('evt: {}'.format(evt.result.translations))
         # print('JSON: {}'.format(evt.result.json))
-        parsedWords = json.loads(evt.result.json)['Words']
-        englishSentences = evt.result.text.split('.')
-        # print('started1')
-        translatedText = evt.result.translations['hi'].split(u'।')
-        # print('started2')
-        words = []
-        for word in parsedWords:
-            # print(word)
-            words.append(WordWithDuration(word['Duration'], word['Offset'], word['Word']))
-        utterances.append(Utterance(englishSentences, translatedText, words, 0))
-        json_results.append(parsedWords)
-        english_results.append(evt.result.text)
-        hindi_results.append( evt.result.translations['hi'])
-        print(utterances[0].originalSentences, utterances[0].translation)
+        utterance = getUtteranceFromEvent(evt)
+        utterances.append(utterance)
+        json_results.append(utterance.words)
+        english_results.append(utterance.English)
+        hindi_results.append(utterance.Hindi)
 
     speech_recognizer.recognized.connect(handle_final_result)
     # Connect callbacks to the events fired by the speech recognizer
-    speech_recognizer.recognizing.connect(lambda evt: print('RECOGNIZING: {}'.format(evt)))
+    # speech_recognizer.recognizing.connect(lambda evt: print('RECOGNIZING: {}'.format(evt)))
     # speech_recognizer.recognized.connect(lambda evt: print('RECOGNIZED: {}'.format(evt)))
     speech_recognizer.session_started.connect(lambda evt: print('SESSION STARTED: {}'.format(evt)))
     speech_recognizer.session_stopped.connect(lambda evt: print('SESSION STOPPED {}'.format(evt)))
@@ -81,20 +87,17 @@ def translate_continuous():
     speech_recognizer.canceled.connect(stop_cb)
 
     # Start continuous speech recognition
-    # speech_recognizer.recognize_once()
     speech_recognizer.start_continuous_recognition()
     while not done:
         time.sleep(.05)
-        # print('Transalting')
 
     print("Printing all results:")
     print(english_results)
     print(hindi_results)
     with open(f"../Results/{fileName}_json_results.txt", 'w') as filehandle:
-        json.dump(json_results, filehandle)
+        json.dump(json_results, filehandle, default=lambda o: o.__dict__)
     # with open(f"../Results/{fileName}_utterance.json", 'w') as filehandle:
     #     json.dump(utterances.__dict__, filehandle)
     WriteToFile(english_results, f"../Results/{fileName}_transcribe_eng.txt")
     WriteToFile(hindi_results, f"../Results/{fileName}_translate_hindi.txt")
-
-translate_continuous()
+    return utterances
